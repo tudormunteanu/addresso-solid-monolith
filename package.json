@@ -1,0 +1,19 @@
+{
+  "name": "solid-node-monorepo",
+  "license": "MIT",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"yarn workspace @app/server dev\" \"yarn workspace @app/client dev\"",
+    "build": "yarn workspace @app/server build && yarn workspace @app/client build",
+    "start": "yarn workspace @app/server start",
+    "test": "yarn workspaces run test",
+    "clean": "rm -rf node_modules packages/*/node_modules packages/*/dist"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0",
+    "prettier": "^3.2.5"
+  }
+}
