@@ -2,7 +2,6 @@
 
 Client-server template for a full-stack app using Solid.js, Node.js, Express.
 
-
 # To-do
 
 - in `/server` replace `jest` with `vitest`

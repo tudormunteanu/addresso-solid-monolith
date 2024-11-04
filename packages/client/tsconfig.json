@@ -17,4 +17,4 @@
   },
   "include": ["src/client/**/*.ts", "src/client/**/*.tsx"],
   "exclude": ["node_modules"]
-} 
+}
