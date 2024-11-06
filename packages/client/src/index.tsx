@@ -1,7 +1,9 @@
 import { render } from "solid-js/web";
-import { App } from "./App";
+import { Records } from "./Records";
+import "./index.css";
 
 const root = document.getElementById("root");
+
 if (root) {
-  render(() => <App />, root);
+  render(() => <Records />, root);
 }

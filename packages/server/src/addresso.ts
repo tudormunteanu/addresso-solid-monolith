@@ -45,6 +45,7 @@ const networks: NetworkConfig[] = [
 interface AssetStats {
   asset: string;
   assetContractAddress: string;
+  // TODO: rename this to txnsCount
   count: number;
   value: number;
 }
@@ -57,6 +58,7 @@ interface Interaction {
 }
 
 interface IdentityHubRecord extends Interaction {
+  // TODO: make this an enum
   platform: string;
 }
 
