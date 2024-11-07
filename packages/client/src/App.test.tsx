@@ -38,7 +38,7 @@ describe("App", () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText("Failed to load message. Please try again later."),
+        screen.getByText("Failed to load message. Please try again later.")
       ).toBeInTheDocument();
     });
 

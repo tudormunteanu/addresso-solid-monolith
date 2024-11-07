@@ -18,7 +18,7 @@ async function saveCacheToFile(filename: string, cache: Map<string, any>) {
   // Remove append flag 'a+' to overwrite file instead of appending
   await fs.writeFile(
     filename,
-    JSON.stringify(Object.fromEntries(cache), null, 2),
+    JSON.stringify(Object.fromEntries(cache), null, 2)
   );
 }
 

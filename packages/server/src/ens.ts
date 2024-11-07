@@ -1,7 +1,3 @@
-/*
-    Integration with ENS
-*/
-
 import publicClient from "./viem_client";
 import { loadCacheFromFile, saveCacheToFile } from "./cache";
 

@@ -7,6 +7,7 @@ import {
 import { ethers } from "ethers";
 
 import getEnsName from "./ens";
+import { fetchAssetTransfers } from "./alchemy";
 
 const ALCHEMY_API_KEY = "1I-SRdvBCcKCuMCsFhU9CBmxbuK058eg";
 // TODO: add info about the example wallet used
@@ -54,7 +55,9 @@ interface Interaction {
   toContractAddress: string;
   toContractLabel: string | null;
   txnsCount: number;
-  txnsStats: Map<string, AssetStats>;
+  txnsStats: {
+    [key: string]: AssetStats;
+  };
 }
 
 interface IdentityHubRecord extends Interaction {
@@ -77,21 +80,8 @@ function calculateTransferValue(transferValue: any): number {
   }
 }
 
-async function fetchAssetTransfers(
-  alchemy: Alchemy,
-  address: string,
-  categories: AssetTransfersCategory[],
-): Promise<AssetTransfersResult> {
-  // @ts-ignore
-  return await alchemy.core.getAssetTransfers({
-    fromAddress: address,
-    category: categories,
-    maxCount: 1000,
-  });
-}
-
 async function processTransfers(
-  result: AssetTransfersResult,
+  result: AssetTransfersResult
 ): Promise<Map<string, Interaction>> {
   const interactions: Map<string, Interaction> = new Map();
 
@@ -108,7 +98,7 @@ async function processTransfers(
         toContractAddress: toAddress,
         toContractLabel: null,
         txnsCount: 0,
-        txnsStats: new Map(),
+        txnsStats: {},
       });
     }
 
@@ -117,17 +107,17 @@ async function processTransfers(
 
     const asset = transfer.asset;
     const contractAddress = transfer.rawContract.address || ethers.ZeroAddress;
-    // TODO: find a better key than the asset name
-    if (!interaction.txnsStats.has(asset)) {
-      interaction.txnsStats.set(asset, {
+
+    if (!interaction.txnsStats[asset]) {
+      interaction.txnsStats[asset] = {
         asset,
         assetContractAddress: contractAddress,
         count: 0,
         value: 0,
-      });
+      };
     }
-    interaction.txnsStats.get(asset)!.count++;
-    interaction.txnsStats.get(asset)!.value += value;
+    interaction.txnsStats[asset].count++;
+    interaction.txnsStats[asset].value += value;
   }
 
   return interactions;
@@ -135,7 +125,7 @@ async function processTransfers(
 
 function sortAndLimitInteractions(
   interactions: Map<string, Interaction>,
-  limit: number,
+  limit: number
 ): Interaction[] {
   return Array.from(interactions.values())
     .sort((a, b) => b.txnsCount - a.txnsCount)
@@ -145,14 +135,14 @@ function sortAndLimitInteractions(
 async function populateContractLabels(interactions: Interaction[]) {
   for (const interaction of interactions) {
     interaction.toContractLabel = await getEnsName(
-      interaction.toContractAddress as `0x${string}`,
+      interaction.toContractAddress as `0x${string}`
     );
   }
 }
 
 async function getTopInteractions(
   address: string,
-  networkConfig: NetworkConfig,
+  networkConfig: NetworkConfig
 ): Promise<Interaction[]> {
   const alchemy = new Alchemy({
     apiKey: ALCHEMY_API_KEY,
@@ -163,7 +153,7 @@ async function getTopInteractions(
     const result = await fetchAssetTransfers(
       alchemy,
       address,
-      networkConfig.categories,
+      networkConfig.categories
     );
     const interactions = await processTransfers(result);
     const sortedInteractions = sortAndLimitInteractions(interactions, 5);
@@ -172,14 +162,14 @@ async function getTopInteractions(
   } catch (error) {
     console.error(
       `Error fetching transactions for ${networkConfig.name}:`,
-      error,
+      error
     );
     return [];
   }
 }
 
 async function getTransactionsForAllNetworks(
-  address: string,
+  address: string
 ): Promise<IdentityHubRecord[]> {
   const results = await Promise.all(
     networks.map(async (network) => {
@@ -188,7 +178,7 @@ async function getTransactionsForAllNetworks(
         ...interaction,
         platform: network.name,
       }));
-    }),
+    })
   );
 
   return results.flat().sort((a, b) => b.txnsCount - a.txnsCount);

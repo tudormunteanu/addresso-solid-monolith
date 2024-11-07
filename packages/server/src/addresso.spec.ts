@@ -16,7 +16,7 @@ describe("fetch top 5 most recently interacted with addresses", () => {
 describe("resolve an ENS name", () => {
   it("should resolve an ENS name", async () => {
     const ensName = await getEnsName(
-      "0x225f137127d9067788314bc7fcc1f36746a3c3B5",
+      "0x225f137127d9067788314bc7fcc1f36746a3c3B5"
     );
     expect(ensName).toBe("luc.eth");
   }, 10000);
