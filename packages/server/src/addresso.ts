@@ -8,6 +8,7 @@ import { ethers } from "ethers";
 
 import getEnsName from "./ens";
 import { fetchAssetTransfers } from "./alchemy";
+import { Interaction, IdentityHubRecord } from "@project/shared";
 
 const ALCHEMY_API_KEY = "1I-SRdvBCcKCuMCsFhU9CBmxbuK058eg";
 // TODO: add info about the example wallet used
@@ -42,28 +43,6 @@ const networks: NetworkConfig[] = [
     ],
   },
 ];
-
-interface AssetStats {
-  asset: string;
-  assetContractAddress: string;
-  // TODO: rename this to txnsCount
-  count: number;
-  value: number;
-}
-
-interface Interaction {
-  toContractAddress: string;
-  toContractLabel: string | null;
-  txnsCount: number;
-  txnsStats: {
-    [key: string]: AssetStats;
-  };
-}
-
-interface IdentityHubRecord extends Interaction {
-  // TODO: make this an enum
-  platform: string;
-}
 
 function calculateTransferValue(transferValue: any): number {
   if (transferValue === null) return 0;
@@ -186,6 +165,7 @@ async function getTransactionsForAllNetworks(
 
 async function main() {
   const records = await getTransactionsForAllNetworks(walletAddress);
+  // return { records: recordss };
   return { records };
 }
 

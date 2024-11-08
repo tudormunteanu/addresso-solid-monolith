@@ -4,7 +4,7 @@ import ExternalLink from "./components/ExternalLink";
 import CopyButton from "./components/CopyButton";
 import Footer from "./components/Footer";
 import TransactionStats from "./components/TransactionStats";
-import { Record } from "./types";
+import { IdentityHubRecord } from "@project/shared";
 import { platforms } from "./config/platforms";
 import AddressLabelEditor from "./components/AddressLabelEditor";
 
@@ -17,7 +17,7 @@ const getExplorerUrl = (platform: string, address: string) => {
 };
 
 export const Records: Component = () => {
-  const [records, setRecords] = createSignal<Record[]>([]);
+  const [records, setRecords] = createSignal<IdentityHubRecord[]>([]);
   const [error, setError] = createSignal<string | null>(null);
   const [loading, setLoading] = createSignal(true);
 

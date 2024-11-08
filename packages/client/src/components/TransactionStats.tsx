@@ -1,12 +1,10 @@
 import { Component, For } from "solid-js";
-import { TxnStat } from "../types";
-import CopyButton from "./CopyButton";
-import ExternalLink from "./ExternalLink";
+import { AssetStats } from "@project/shared";
 import { PlatformConfig } from "../config/platforms";
 import AddressLabelEditor from "./AddressLabelEditor";
 
 interface TransactionStatsProps {
-  stats: { [key: string]: TxnStat };
+  stats: { [key: string]: AssetStats };
   platform: PlatformConfig;
   onEditLabel: (address: string) => void;
   onSaveLabel: (address: string, newLabel: string) => void;
