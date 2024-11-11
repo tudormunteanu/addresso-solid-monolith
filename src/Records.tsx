@@ -32,9 +32,14 @@ export const Records: Component = () => {
   };
 
   onMount(async () => {
-    const data = await fetchRecords();
-    // setRecords(data.records);
-    setLoading(false);
+    try {
+      const data = await fetchRecords();
+      setRecords(data.records);
+    } catch (error) {
+      setError("Failed to load message. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
   });
 
   return (
@@ -66,6 +71,8 @@ export const Records: Component = () => {
         <div class="space-y-4 mb-20">
           {loading() ? (
             <div class="text-center py-8 text-gray-600">Loading...</div>
+          ) : error() ? (
+            <div class="text-center py-8 text-red-600">{error()}</div>
           ) : (
             records().map((record) => (
               <div class="bg-white rounded-lg shadow p-4 flex justify-between items-start">
@@ -82,7 +89,7 @@ export const Records: Component = () => {
                   {/* TODO: add the platform name */}
                   <div class="text-sm text-gray-500">
                     <strong>Blockchain:</strong>{" "}
-                    {platforms[record.platform].name}
+                    <span>{platforms[record.platform].name}</span>
                   </div>
 
                   <div class="text-sm text-gray-500 mt-2">

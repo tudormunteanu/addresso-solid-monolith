@@ -1,11 +1,36 @@
 import { render, screen, waitFor } from "@solidjs/testing-library";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { Records } from "./Records";
+import { main as fetchRecords } from "./services/addresso";
 
+// Mock at the top level
+vi.mock("./services/addresso", () => ({
+  main: vi.fn(),
+}));
 
 describe("Records", () => {
   beforeEach(() => {
     vi.resetAllMocks();
+    
+    // Set up the mock implementation for each test
+    (fetchRecords as any).mockResolvedValue({
+      records: [
+        {
+          platform: "ethereum",
+          toContractAddress: "0x0000000000000000000000000000000000000000",
+          toContractLabel: null,
+          txnsCount: 1,
+          txnsStats: {
+            USDC: {
+              asset: "USDC",
+              assetContractAddress: "0x0000000000000000000000000000000000000000",
+              count: 1,
+              value: 100,
+            },
+          },
+        },
+      ],
+    });
   });
 
   it("should show loading message initially", () => {
@@ -14,43 +39,19 @@ describe("Records", () => {
   });
 
   it("should fetch and display records from API", async () => {
-    global.fetch = vi.fn().mockResolvedValue({
-      json: () =>
-        Promise.resolve({
-          records: [
-            {
-              platform: "ethereum",
-              toContractAddress: "0x0000000000000000000000000000000000000000",
-              toContractLabel: null,
-              txnsCount: 1,
-              txnsStats: {
-                USDC: {
-                  asset: "USDC",
-                  assetContractAddress:
-                    "0x0000000000000000000000000000000000000000",
-                  count: 1,
-                  value: 100,
-                },
-              },
-            },
-          ],
-        }),
-      ok: true,
-    });
-
     render(() => <Records />);
 
     expect(screen.getByText("Loading...")).toBeInTheDocument();
 
     await waitFor(() => {
-      expect(screen.getByText("ethereum")).toBeInTheDocument();
+      expect(screen.getByText("Ethereum")).toBeInTheDocument();
     });
 
-    expect(fetch).toHaveBeenCalledWith("/api/addresso");
+    expect(fetchRecords).toHaveBeenCalled();
   });
 
   it("should handle API errors gracefully", async () => {
-    global.fetch = vi.fn().mockRejectedValue(new Error("API Error"));
+    (fetchRecords as any).mockRejectedValue(new Error("API Error"));
 
     render(() => <Records />);
 
@@ -62,6 +63,6 @@ describe("Records", () => {
       ).toBeInTheDocument();
     });
 
-    expect(fetch).toHaveBeenCalledWith("/api/addresso");
+    expect(fetchRecords).toHaveBeenCalled();
   });
 });
