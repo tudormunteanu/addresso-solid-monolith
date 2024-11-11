@@ -1,12 +1,12 @@
 import { Component, createSignal, onMount } from "solid-js";
 import "./index.css";
-import ExternalLink from "./components/ExternalLink";
-import CopyButton from "./components/CopyButton";
 import Footer from "./components/Footer";
 import TransactionStats from "./components/TransactionStats";
-import { IdentityHubRecord } from "@project/shared";
+import { IdentityHubRecord } from "./types";
 import { platforms } from "./config/platforms";
 import AddressLabelEditor from "./components/AddressLabelEditor";
+
+import { main as fetchRecords } from "./services/addresso";
 
 const getExplorerUrl = (platform: string, address: string) => {
   const baseUrl =
@@ -32,18 +32,9 @@ export const Records: Component = () => {
   };
 
   onMount(async () => {
-    try {
-      const response = await fetch("/api/addresso");
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-      setRecords(data.records);
-    } catch (error) {
-      setError("Failed to load message. Please try again later.");
-    } finally {
-      setLoading(false);
-    }
+    const data = await fetchRecords();
+    // setRecords(data.records);
+    setLoading(false);
   });
 
   return (

@@ -4,11 +4,11 @@ import {
   AssetTransfersCategory,
   AssetTransfersResult,
 } from "alchemy-sdk";
-import { ethers } from "ethers";
+import { formatEther, zeroAddress } from "viem";
 
-import getEnsName from "./ens";
 import { fetchAssetTransfers } from "./alchemy";
-import { Interaction, IdentityHubRecord } from "@project/shared";
+import { Interaction, IdentityHubRecord } from "../types";
+import getEnsName from "./ens";
 
 const ALCHEMY_API_KEY = "1I-SRdvBCcKCuMCsFhU9CBmxbuK058eg";
 // TODO: add info about the example wallet used
@@ -49,13 +49,13 @@ function calculateTransferValue(transferValue: any): number {
 
   if (typeof transferValue === "string") {
     // If it's already a string, it might be in wei format
-    return Number(ethers.formatEther(transferValue));
+    return Number(formatEther(BigInt(transferValue)));
   } else if (typeof transferValue === "number") {
     // If it's a number, assume it's already in ether
     return transferValue;
   } else {
     // For any other type, convert to string and then to ether
-    return Number(ethers.formatEther(transferValue.toString()));
+    return Number(formatEther(BigInt(transferValue.toString())));
   }
 }
 
@@ -85,7 +85,7 @@ async function processTransfers(
     interaction.txnsCount++;
 
     const asset = transfer.asset;
-    const contractAddress = transfer.rawContract.address || ethers.ZeroAddress;
+    const contractAddress = transfer.rawContract.address || zeroAddress;
 
     if (!interaction.txnsStats[asset]) {
       interaction.txnsStats[asset] = {
@@ -165,7 +165,6 @@ async function getTransactionsForAllNetworks(
 
 async function main() {
   const records = await getTransactionsForAllNetworks(walletAddress);
-  // return { records: recordss };
   return { records };
 }
 

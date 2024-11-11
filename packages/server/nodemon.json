@@ -1,7 +1,0 @@
-{
-  "watch": ["src/**/*"],
-  "ext": "ts,json",
-  "exec": "(tsc --noEmit --pretty || true) && NODE_OPTIONS='--loader ts-node/esm --experimental-specifier-resolution=node --enable-source-maps' node src/index.ts",
-  "ignore": ["**/*.test.ts", "**/*.spec.ts", ".git", "node_modules"],
-  "verbose": true
-}

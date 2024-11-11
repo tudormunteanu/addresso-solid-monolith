@@ -7,4 +7,4 @@ const publicClient = createPublicClient({
   transport: http(),
 });
 
-export default publicClient;
+export default publicClient; 
