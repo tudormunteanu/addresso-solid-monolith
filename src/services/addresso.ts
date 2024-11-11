@@ -87,12 +87,13 @@ async function processTransfers(
 
     if (transfer.category === AssetTransfersCategory.ERC20) {
       const contractAddress = transfer.rawContract.address;
-      const onchainName = `${transfer.asset} (source: .name() method)`;
+      const onchainName = transfer.asset;
       if (!records.has(contractAddress)) {
         records.set(contractAddress, {
           hexAddress: contractAddress,
           hexAddressName: null,
           onchainName: onchainName,
+          onchainNameSource: "ERC20 .name() method",
           totalValue: 0,
           txnsCount: 0,
           platform: "",
@@ -102,12 +103,14 @@ async function processTransfers(
       record.txnsCount++;
       record.totalValue += value;
     } else if (transfer.category === AssetTransfersCategory.EXTERNAL) {
-      const onchainName = `${transfer.asset} (source: native token)`;
+      const onchainName = transfer.asset;
+      const onchainNameSource = "native token";
       if (!records.has(toAddress)) {
         records.set(toAddress, {
           hexAddress: toAddress,
           hexAddressName: null,
           onchainName: onchainName,
+          onchainNameSource: onchainNameSource,
           totalValue: 0,
           txnsCount: 0,
           platform: "",

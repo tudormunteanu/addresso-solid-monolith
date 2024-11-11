@@ -94,6 +94,10 @@ export const Records: Component = () => {
                   <div class="text-sm text-gray-500 mt-2">
                     <strong>On-chain Name:</strong>{" "}
                     <span>{record.onchainName || "not found"}</span>
+                    {" "}
+                    <span class="text-xs text-gray-500">
+                      ({record.onchainNameSource || ""})
+                    </span>
                   </div>
 
                   <div class="text-sm text-gray-500 mt-2">
@@ -101,7 +105,7 @@ export const Records: Component = () => {
                       <strong>Stats:</strong>
                       <span>
                         {record.txnsCount} transactions; total value:{" "}
-                        {record.totalValue?.toFixed(4) || "unknown"} ETH
+                        {record.totalValue?.toFixed(4) || "unknown"} {record.onchainName || ""}
                       </span>
                     </div>
                   </div>
