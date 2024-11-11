@@ -64,7 +64,7 @@ const AddressLabelEditor: Component<AddressLabelEditorProps> = ({
           </div>
         </div>
       ) : (
-        <div class="flex flex-col gap-1">
+        <div class="flex flex-col gap-1 bg-gray-100 p-2 mr-2 rounded">
           <div class="flex items-center gap-2">
             <span class="text-lg font-semibold">
               {currentLabel ? (

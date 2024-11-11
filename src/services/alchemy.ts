@@ -5,8 +5,11 @@ import {
 } from "alchemy-sdk";
 import { loadCacheFromStorage, saveCacheToStorage } from "./cache";
 
-function getCacheKey(address: string, categories: AssetTransfersCategory[]): string {
-  return `transfers_${address}_${categories.join('_')}`;
+function getCacheKey(
+  address: string,
+  categories: AssetTransfersCategory[]
+): string {
+  return `transfers_${address}_${categories.join("_")}`;
 }
 
 async function fetchAssetTransfers(
@@ -16,7 +19,7 @@ async function fetchAssetTransfers(
 ): Promise<AssetTransfersResult> {
   const cache = loadCacheFromStorage();
   const cacheKey = getCacheKey(address, categories);
-  
+
   // Check cache first
   const cachedData = cache.get(cacheKey);
   if (cachedData) {

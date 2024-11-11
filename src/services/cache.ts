@@ -1,7 +1,7 @@
 const CACHE_KEY = "addressoAlchemyCache";
 
 function isServer() {
-  return typeof window === 'undefined';
+  return typeof window === "undefined";
 }
 
 function loadCacheFromStorage(): Map<string, any> {
@@ -17,7 +17,7 @@ function loadCacheFromStorage(): Map<string, any> {
     const parsed = JSON.parse(data);
     return new Map(Object.entries(parsed));
   } catch (error) {
-    console.error('Error loading cache from localStorage:', error);
+    console.error("Error loading cache from localStorage:", error);
     return new Map();
   }
 }
@@ -28,12 +28,9 @@ function saveCacheToStorage(cache: Map<string, any>): void {
   }
 
   try {
-    localStorage.setItem(
-      CACHE_KEY,
-      JSON.stringify(Object.fromEntries(cache))
-    );
+    localStorage.setItem(CACHE_KEY, JSON.stringify(Object.fromEntries(cache)));
   } catch (error) {
-    console.error('Error saving cache to localStorage:', error);
+    console.error("Error saving cache to localStorage:", error);
   }
 }
 

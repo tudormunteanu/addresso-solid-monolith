@@ -7,7 +7,7 @@ import {
 import { formatEther, zeroAddress } from "viem";
 
 import { fetchAssetTransfers } from "./alchemy";
-import { Interaction, IdentityHubRecord } from "../types";
+import { Record } from "../types";
 import getEnsName from "./ens";
 
 const ALCHEMY_API_KEY = "1I-SRdvBCcKCuMCsFhU9CBmxbuK058eg";
@@ -61,8 +61,21 @@ function calculateTransferValue(transferValue: any): number {
 
 async function processTransfers(
   result: AssetTransfersResult
-): Promise<Map<string, Interaction>> {
-  const interactions: Map<string, Interaction> = new Map();
+): Promise<Map<string, Record>> {
+  const records: Map<string, Record> = new Map();
+
+  // The results have the following structure:
+  // - asset
+  // - category; eg. erc20
+  // - to
+  // - rawContract
+  //   - address
+  // - value
+
+  // TODO: aggregate transfers by a few criteria
+  // - if category is erc20, aggregate by `rawContract.address`; the totalValue and txnsCount should be summed up
+  // - if category is external, aggregate by `to`; the totalValue and txnsCount should be summed up
+  // - for any other category, skip
 
   // @ts-ignore
   for (const transfer of result.transfers) {
@@ -72,49 +85,59 @@ async function processTransfers(
 
     const value = calculateTransferValue(transfer.value);
 
-    if (!interactions.has(toAddress)) {
-      interactions.set(toAddress, {
-        toContractAddress: toAddress,
-        toContractLabel: null,
-        txnsCount: 0,
-        txnsStats: {},
-      });
+    if (transfer.category === AssetTransfersCategory.ERC20) {
+      const contractAddress = transfer.rawContract.address;
+      const onchainName = `${transfer.asset} (source: .name() method)`;
+      if (!records.has(contractAddress)) {
+        records.set(contractAddress, {
+          hexAddress: contractAddress,
+          hexAddressName: null,
+          onchainName: onchainName,
+          totalValue: 0,
+          txnsCount: 0,
+          platform: "",
+        });
+      }
+      const record = records.get(contractAddress)!;
+      record.txnsCount++;
+      record.totalValue += value;
+    } else if (transfer.category === AssetTransfersCategory.EXTERNAL) {
+      const onchainName = `${transfer.asset} (source: native token)`;
+      if (!records.has(toAddress)) {
+        records.set(toAddress, {
+          hexAddress: toAddress,
+          hexAddressName: null,
+          onchainName: onchainName,
+          totalValue: 0,
+          txnsCount: 0,
+          platform: "",
+        });
+      }
+      const record = records.get(toAddress)!;
+      record.txnsCount++;
+      record.totalValue += value;
+    } else {
+      // Skip
+      continue;
     }
-
-    const interaction = interactions.get(toAddress)!;
-    interaction.txnsCount++;
-
-    const asset = transfer.asset;
-    const contractAddress = transfer.rawContract.address || zeroAddress;
-
-    if (!interaction.txnsStats[asset]) {
-      interaction.txnsStats[asset] = {
-        asset,
-        assetContractAddress: contractAddress,
-        count: 0,
-        value: 0,
-      };
-    }
-    interaction.txnsStats[asset].count++;
-    interaction.txnsStats[asset].value += value;
   }
 
-  return interactions;
+  return records;
 }
 
 function sortAndLimitInteractions(
-  interactions: Map<string, Interaction>,
+  interactions: Map<string, Record>,
   limit: number
-): Interaction[] {
+): Record[] {
   return Array.from(interactions.values())
     .sort((a, b) => b.txnsCount - a.txnsCount)
     .slice(0, limit);
 }
 
-async function populateContractLabels(interactions: Interaction[]) {
+async function populateOnchainNames(interactions: Record[]) {
   for (const interaction of interactions) {
-    interaction.toContractLabel = await getEnsName(
-      interaction.toContractAddress as `0x${string}`
+    interaction.onchainName = await getEnsName(
+      interaction.hexAddress as `0x${string}`
     );
   }
 }
@@ -122,7 +145,7 @@ async function populateContractLabels(interactions: Interaction[]) {
 async function getTopInteractions(
   address: string,
   networkConfig: NetworkConfig
-): Promise<Interaction[]> {
+): Promise<Record[]> {
   const alchemy = new Alchemy({
     apiKey: ALCHEMY_API_KEY,
     network: networkConfig.network,
@@ -136,7 +159,7 @@ async function getTopInteractions(
     );
     const interactions = await processTransfers(result);
     const sortedInteractions = sortAndLimitInteractions(interactions, 5);
-    await populateContractLabels(sortedInteractions);
+    // await populateOnchainNames(sortedInteractions);
     return sortedInteractions;
   } catch (error) {
     console.error(
@@ -149,7 +172,7 @@ async function getTopInteractions(
 
 async function getTransactionsForAllNetworks(
   address: string
-): Promise<IdentityHubRecord[]> {
+): Promise<Record[]> {
   const results = await Promise.all(
     networks.map(async (network) => {
       const interactions = await getTopInteractions(address, network);

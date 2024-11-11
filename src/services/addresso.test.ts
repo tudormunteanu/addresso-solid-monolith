@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { main } from "./addresso";
 import { fetchAssetTransfers } from "./alchemy";
+import { AssetTransfersCategory } from "alchemy-sdk";
 import getEnsName from "./ens";
 
 vi.mock("./alchemy", () => ({
@@ -17,7 +18,9 @@ describe("addresso", () => {
       transfers: [
         {
           to: "0x1234567890123456789012345678901234567890",
-          value: "1000000000000000000", // 1 ETH in wei
+          // 1 ETH in wei
+          category: AssetTransfersCategory.EXTERNAL,
+          value: "1000000000000000000",
           asset: "ETH",
           rawContract: {
             address: "0x0000000000000000000000000000000000000000",
@@ -38,19 +41,12 @@ describe("addresso", () => {
     // Check the first record
     const firstRecord = result.records[0];
     expect(firstRecord).toMatchObject({
-      toContractAddress: "0x1234567890123456789012345678901234567890",
-      toContractLabel: null,
+      hexAddress: "0x1234567890123456789012345678901234567890",
+      hexAddressName: null,
+      onchainName: "ETH (source: native token)",
+      totalValue: 1,
       txnsCount: 1,
       platform: expect.stringMatching(/^(ethereum|base)$/),
     });
-
-    // Verify transaction stats
-    expect(firstRecord.txnsStats).toHaveProperty("ETH");
-    expect(firstRecord.txnsStats.ETH).toMatchObject({
-      asset: "ETH",
-      count: 1,
-      value: 1, // Should be converted from wei to ETH
-    });
   });
 });
-         

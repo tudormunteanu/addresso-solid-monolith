@@ -11,7 +11,7 @@ vi.mock("./services/addresso", () => ({
 describe("Records", () => {
   beforeEach(() => {
     vi.resetAllMocks();
-    
+
     // Set up the mock implementation for each test
     (fetchRecords as any).mockResolvedValue({
       records: [
@@ -23,7 +23,8 @@ describe("Records", () => {
           txnsStats: {
             USDC: {
               asset: "USDC",
-              assetContractAddress: "0x0000000000000000000000000000000000000000",
+              assetContractAddress:
+                "0x0000000000000000000000000000000000000000",
               count: 1,
               value: 100,
             },

@@ -13,8 +13,8 @@ export default defineConfig({
     server: {
       deps: {
         inline: ["ws", "alchemy-sdk"],
-        fallbackCJS: true
+        fallbackCJS: true,
       },
     },
-  }
+  },
 });

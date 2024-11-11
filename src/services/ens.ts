@@ -20,4 +20,4 @@ async function getEnsName(address: `0x${string}`) {
   }
 }
 
-export default getEnsName; 
+export default getEnsName;

@@ -17,7 +17,7 @@ const TransactionStats: Component<TransactionStatsProps> = (props) => {
       <summary class="cursor-pointer text-sm text-gray-600 hover:text-gray-800">
         View Transactions
       </summary>
-      <div class="mt-2 pl-4 space-y-2">
+      <div class="mt-2 pl-4 space-y-10">
         <For each={Object.values(props.stats)}>
           {(stat) => (
             <div class="text-sm text-gray-600 pb-2 border-b border-gray-200 last:border-b-0">

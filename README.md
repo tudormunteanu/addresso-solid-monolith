@@ -10,8 +10,9 @@ x add some basic styling (Tailwind vs ???); must have collapsible sections
 x allow users to input labels for contracts
 x add a hero section describing the content of this page
 x display a list of transactions under each record
+x add edit button to each token transfer
 
-- add edit button to each token transfer
+- ingest Fc graph data
 - add ability to add records
 - add external links to other portfolio managers (DeBank, Arkham)
 - share types between BE and FE

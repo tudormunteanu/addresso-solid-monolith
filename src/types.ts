@@ -1,19 +1,9 @@
-export type AssetStats = {
-  asset: string;
-  assetContractAddress: string;
-  count: number;
-  value: number;
-};
-
-export type Interaction = {
-  toContractAddress: string;
-  toContractLabel: string | null;
+export type Record = {
+  hexAddress: string;
+  hexAddressName: string | null;
+  // Could be ENS, ERC20.name, ERC721.name, etc.
+  onchainName: string | null;
+  totalValue: number;
   txnsCount: number;
-  txnsStats: {
-    [key: string]: AssetStats;
-  };
-};
-
-export type IdentityHubRecord = Interaction & {
   platform: string;
 };

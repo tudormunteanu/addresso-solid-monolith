@@ -1,8 +1,7 @@
 import { Component, createSignal, onMount } from "solid-js";
 import "./index.css";
 import Footer from "./components/Footer";
-import TransactionStats from "./components/TransactionStats";
-import { IdentityHubRecord } from "./types";
+import { Record } from "./types";
 import { platforms } from "./config/platforms";
 import AddressLabelEditor from "./components/AddressLabelEditor";
 
@@ -17,15 +16,15 @@ const getExplorerUrl = (platform: string, address: string) => {
 };
 
 export const Records: Component = () => {
-  const [records, setRecords] = createSignal<IdentityHubRecord[]>([]);
+  const [records, setRecords] = createSignal<Record[]>([]);
   const [error, setError] = createSignal<string | null>(null);
   const [loading, setLoading] = createSignal(true);
 
   const handleSaveLabel = (address: string, newLabelValue: string) => {
     setRecords((prev) =>
       prev.map((record) =>
-        record.toContractAddress === address
-          ? { ...record, toContractLabel: newLabelValue || null }
+        record.hexAddress === address
+          ? { ...record, hexAddressName: newLabelValue || null }
           : record
       )
     );
@@ -78,8 +77,8 @@ export const Records: Component = () => {
               <div class="bg-white rounded-lg shadow p-4 flex justify-between items-start">
                 <div class="flex-1">
                   <AddressLabelEditor
-                    address={record.toContractAddress}
-                    currentLabel={record.toContractLabel}
+                    address={record.hexAddress}
+                    currentLabel={record.hexAddressName}
                     onEdit={() => {}}
                     onSave={handleSaveLabel}
                     getExplorerUrl={getExplorerUrl}
@@ -93,33 +92,18 @@ export const Records: Component = () => {
                   </div>
 
                   <div class="text-sm text-gray-500 mt-2">
-                    <strong>ENS:</strong> not found
-                  </div>
-
-                  <div class="text-sm text-gray-500 mt-2">
-                    <strong>Type:</strong> wallet | contract
+                    <strong>On-chain Name:</strong>{" "}
+                    <span>{record.onchainName || "not found"}</span>
                   </div>
 
                   <div class="text-sm text-gray-500 mt-2">
                     <div class="flex items-center gap-2">
                       <strong>Stats:</strong>
                       <span>
-                        {record.txnsCount} transactions; total value: 999 ETH
+                        {record.txnsCount} transactions; total value:{" "}
+                        {record.totalValue?.toFixed(4) || "unknown"} ETH
                       </span>
                     </div>
-                    <TransactionStats
-                      stats={record.txnsStats}
-                      platform={platforms[record.platform]}
-                      onEditLabel={() => {}}
-                      onSaveLabel={handleSaveLabel}
-                      currentLabels={records().reduce(
-                        (acc, rec) => ({
-                          ...acc,
-                          [rec.toContractAddress]: rec.toContractLabel,
-                        }),
-                        {}
-                      )}
-                    />
                   </div>
                 </div>
 
